@@ -10,179 +10,179 @@ import com.badlogic.gdx.utils.Array;
 
 public class SystemManagerTests {
 
-	private static class SystemListenerSpy implements SystemListener {
-		public int addedCount = 0;
-		public int removedCount = 0;
-		
-		@Override
-		public void systemAdded (EntitySystem system) {
-			system.addedToEngine(null);
-			++addedCount;
-		}
+    private static class SystemListenerSpy implements SystemListener {
+        public int addedCount = 0;
+        public int removedCount = 0;
 
-		@Override
-		public void systemRemoved (EntitySystem system) {
-			system.removedFromEngine(null);
-			removedCount++;
-		}
-	}
-	
-	private static class EntitySystemMock extends EntitySystem {
-		public int addedCalls = 0;
-		public int removedCalls = 0;
+        @Override
+        public void systemAdded(EntitySystem system) {
+            system.addedToEngine(null);
+            ++addedCount;
+        }
 
-		private Array<Integer> updates;
+        @Override
+        public void systemRemoved(EntitySystem system) {
+            system.removedFromEngine(null);
+            removedCount++;
+        }
+    }
 
-		public EntitySystemMock () {
-			super();
-		}
+    private static class EntitySystemMock extends EntitySystem {
+        public int addedCalls = 0;
+        public int removedCalls = 0;
 
-		public EntitySystemMock (Array<Integer> updates) {
-			super();
+        private Array<Integer> updates;
 
-			this.updates = updates;
-		}
+        public EntitySystemMock() {
+            super();
+        }
 
-		@Override
-		public void update (float deltaTime) {
-			if (updates != null) {
-				updates.add(priority);
-			}
-		}
+        public EntitySystemMock(Array<Integer> updates) {
+            super();
 
-		@Override
-		public void addedToEngine (Engine engine) {
-			++addedCalls;
-		}
+            this.updates = updates;
+        }
 
-		@Override
-		public void removedFromEngine (Engine engine) {
-			++removedCalls;
-		}
-	}
+        @Override
+        public void update(float deltaTime) {
+            if (updates != null) {
+                updates.add(priority);
+            }
+        }
 
-	private static class EntitySystemMockA extends EntitySystemMock {
+        @Override
+        public void addedToEngine(Engine engine) {
+            ++addedCalls;
+        }
 
-		public EntitySystemMockA () {
-			super();
-		}
+        @Override
+        public void removedFromEngine(Engine engine) {
+            ++removedCalls;
+        }
+    }
 
-		public EntitySystemMockA (Array<Integer> updates) {
-			super(updates);
-		}
-	}
+    private static class EntitySystemMockA extends EntitySystemMock {
 
-	private static class EntitySystemMockB extends EntitySystemMock {
+        public EntitySystemMockA() {
+            super();
+        }
 
-		public EntitySystemMockB () {
-			super();
-		}
+        public EntitySystemMockA(Array<Integer> updates) {
+            super(updates);
+        }
+    }
 
-		public EntitySystemMockB (Array<Integer> updates) {
-			super(updates);
-		}
-	}
-	
-	@Test
-	public void addAndRemoveSystem () {
-		EntitySystemMockA systemA = new EntitySystemMockA();
-		EntitySystemMockB systemB = new EntitySystemMockB();
-		
-		SystemListenerSpy systemSpy = new SystemListenerSpy();
-		SystemManager manager = new SystemManager(systemSpy);
+    private static class EntitySystemMockB extends EntitySystemMock {
 
-		assertNull(manager.getSystem(EntitySystemMockA.class));
-		assertNull(manager.getSystem(EntitySystemMockB.class));
+        public EntitySystemMockB() {
+            super();
+        }
 
-		manager.addSystem(systemA);
-		manager.addSystem(systemB);
+        public EntitySystemMockB(Array<Integer> updates) {
+            super(updates);
+        }
+    }
 
-		assertNotNull(manager.getSystem(EntitySystemMockA.class));
-		assertNotNull(manager.getSystem(EntitySystemMockB.class));
-		assertEquals(1, systemA.addedCalls);
-		assertEquals(1, systemB.addedCalls);
+    @Test
+    public void addAndRemoveSystem() {
+        EntitySystemMockA systemA = new EntitySystemMockA();
+        EntitySystemMockB systemB = new EntitySystemMockB();
 
-		manager.removeSystem(systemA);
-		manager.removeSystem(systemB);
+        SystemListenerSpy systemSpy = new SystemListenerSpy();
+        SystemManager manager = new SystemManager(systemSpy);
 
-		assertNull(manager.getSystem(EntitySystemMockA.class));
-		assertNull(manager.getSystem(EntitySystemMockB.class));
-		assertEquals(1, systemA.removedCalls);
-		assertEquals(1, systemB.removedCalls);
+        assertNull(manager.getSystem(EntitySystemMockA.class));
+        assertNull(manager.getSystem(EntitySystemMockB.class));
 
-		manager.addSystem(systemA);
-		manager.addSystem(systemB);
-		manager.removeAllSystems();
+        manager.addSystem(systemA);
+        manager.addSystem(systemB);
 
-		assertNull(manager.getSystem(EntitySystemMockA.class));
-		assertNull(manager.getSystem(EntitySystemMockB.class));
-		assertEquals(2, systemA.removedCalls);
-		assertEquals(2, systemB.removedCalls);
-	}
+        assertNotNull(manager.getSystem(EntitySystemMockA.class));
+        assertNotNull(manager.getSystem(EntitySystemMockB.class));
+        assertEquals(1, systemA.addedCalls);
+        assertEquals(1, systemB.addedCalls);
 
-	@Test
-	public void getSystems () {
-		SystemListenerSpy systemSpy = new SystemListenerSpy();
-		SystemManager manager = new SystemManager(systemSpy);
-		EntitySystemMockA systemA = new EntitySystemMockA();
-		EntitySystemMockB systemB = new EntitySystemMockB();
+        manager.removeSystem(systemA);
+        manager.removeSystem(systemB);
 
-		assertEquals(0, manager.getSystems().size());
+        assertNull(manager.getSystem(EntitySystemMockA.class));
+        assertNull(manager.getSystem(EntitySystemMockB.class));
+        assertEquals(1, systemA.removedCalls);
+        assertEquals(1, systemB.removedCalls);
 
-		manager.addSystem(systemA);
-		manager.addSystem(systemB);
+        manager.addSystem(systemA);
+        manager.addSystem(systemB);
+        manager.removeAllSystems();
 
-		assertEquals(2, manager.getSystems().size());
-		assertEquals(2, systemSpy.addedCount);
-		
-		manager.removeSystem(systemA);
-		manager.removeSystem(systemB);
-		
-		assertEquals(0, manager.getSystems().size());
-		assertEquals(2, systemSpy.addedCount);
-		assertEquals(2, systemSpy.removedCount);
-	}
-	
-	@Test
-	public void addTwoSystemsOfSameClass () {
-		SystemListenerSpy systemSpy = new SystemListenerSpy();
-		SystemManager manager = new SystemManager(systemSpy);
-		EntitySystemMockA system1 = new EntitySystemMockA();
-		EntitySystemMockA system2 = new EntitySystemMockA();
+        assertNull(manager.getSystem(EntitySystemMockA.class));
+        assertNull(manager.getSystem(EntitySystemMockB.class));
+        assertEquals(2, systemA.removedCalls);
+        assertEquals(2, systemB.removedCalls);
+    }
 
-		assertEquals(0, manager.getSystems().size());
+    @Test
+    public void getSystems() {
+        SystemListenerSpy systemSpy = new SystemListenerSpy();
+        SystemManager manager = new SystemManager(systemSpy);
+        EntitySystemMockA systemA = new EntitySystemMockA();
+        EntitySystemMockB systemB = new EntitySystemMockB();
 
-		manager.addSystem(system1);
-		
-		assertEquals(1, manager.getSystems().size());
-		assertEquals(system1, manager.getSystem(EntitySystemMockA.class));
-		assertEquals(1, systemSpy.addedCount);
-		
-		manager.addSystem(system2);
+        assertEquals(0, manager.getSystems().size());
 
-		assertEquals(1, manager.getSystems().size());
-		assertEquals(system2, manager.getSystem(EntitySystemMockA.class));
-		assertEquals(2, systemSpy.addedCount);
-		assertEquals(1, systemSpy.removedCount);
-	}
+        manager.addSystem(systemA);
+        manager.addSystem(systemB);
 
-	@Test
-	public void systemUpdateOrder () {
-		Array<Integer> updates = new Array<Integer>();
+        assertEquals(2, manager.getSystems().size());
+        assertEquals(2, systemSpy.addedCount);
 
-		SystemListenerSpy systemSpy = new SystemListenerSpy();
-		SystemManager manager = new SystemManager(systemSpy);
-		EntitySystemMock system1 = new EntitySystemMockA(updates);
-		EntitySystemMock system2 = new EntitySystemMockB(updates);
+        manager.removeSystem(systemA);
+        manager.removeSystem(systemB);
 
-		system1.priority = 2;
-		system2.priority = 1;
+        assertEquals(0, manager.getSystems().size());
+        assertEquals(2, systemSpy.addedCount);
+        assertEquals(2, systemSpy.removedCount);
+    }
 
-		manager.addSystem(system1);
-		manager.addSystem(system2);
+    @Test
+    public void addTwoSystemsOfSameClass() {
+        SystemListenerSpy systemSpy = new SystemListenerSpy();
+        SystemManager manager = new SystemManager(systemSpy);
+        EntitySystemMockA system1 = new EntitySystemMockA();
+        EntitySystemMockA system2 = new EntitySystemMockA();
 
-		ImmutableArray<EntitySystem> systems = manager.getSystems();
-		assertEquals(system2, systems.get(0));
-		assertEquals(system1, systems.get(1));
-	}
+        assertEquals(0, manager.getSystems().size());
+
+        manager.addSystem(system1);
+
+        assertEquals(1, manager.getSystems().size());
+        assertEquals(system1, manager.getSystem(EntitySystemMockA.class));
+        assertEquals(1, systemSpy.addedCount);
+
+        manager.addSystem(system2);
+
+        assertEquals(1, manager.getSystems().size());
+        assertEquals(system2, manager.getSystem(EntitySystemMockA.class));
+        assertEquals(2, systemSpy.addedCount);
+        assertEquals(1, systemSpy.removedCount);
+    }
+
+    @Test
+    public void systemUpdateOrder() {
+        Array<Integer> updates = new Array<>();
+
+        SystemListenerSpy systemSpy = new SystemListenerSpy();
+        SystemManager manager = new SystemManager(systemSpy);
+        EntitySystemMock system1 = new EntitySystemMockA(updates);
+        EntitySystemMock system2 = new EntitySystemMockB(updates);
+
+        system1.priority = 2;
+        system2.priority = 1;
+
+        manager.addSystem(system1);
+        manager.addSystem(system2);
+
+        ImmutableArray<EntitySystem> systems = manager.getSystems();
+        assertEquals(system2, systems.get(0));
+        assertEquals(system1, systems.get(1));
+    }
 }

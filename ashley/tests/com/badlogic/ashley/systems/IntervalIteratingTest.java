@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package com.badlogic.ashley.systems;
 
 import org.junit.Test;
@@ -28,78 +12,78 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import static org.junit.Assert.*;
 
 public class IntervalIteratingTest {
-	private static final float deltaTime = 0.1f;
+    private static final float deltaTime = 0.1f;
 
-	private static class IntervalComponentSpy implements Component {
-		public int numUpdates = 0;
-	}
+    private static class IntervalComponentSpy implements Component {
+        public int numUpdates = 0;
+    }
 
-	private static class IntervalIteratingSystemSpy extends IntervalIteratingSystem {
-		private ComponentMapper<IntervalComponentSpy> im;
-		public int numStartProcessing;
-		public int numEndProcessing;
+    private static class IntervalIteratingSystemSpy extends IntervalIteratingSystem {
+        private ComponentMapper<IntervalComponentSpy> im;
+        public int numStartProcessing;
+        public int numEndProcessing;
 
 
-		public IntervalIteratingSystemSpy () {
-			super(Family.all(IntervalComponentSpy.class).get(), deltaTime * 2.0f);
+        public IntervalIteratingSystemSpy() {
+            super(Family.all(IntervalComponentSpy.class).get(), deltaTime * 2.0f);
 
-			im = ComponentMapper.getFor(IntervalComponentSpy.class);
-		}
+            im = ComponentMapper.getFor(IntervalComponentSpy.class);
+        }
 
-		@Override
-		public void startProcessing() {
-			numStartProcessing++;
-		}
+        @Override
+        public void startProcessing() {
+            numStartProcessing++;
+        }
 
-		@Override
-		protected void processEntity (Entity entity) {
-			im.get(entity).numUpdates++;
-		}
+        @Override
+        protected void processEntity(Entity entity) {
+            im.get(entity).numUpdates++;
+        }
 
-		@Override
-		public void endProcessing() {
-			numEndProcessing++;
-		}
-	}
+        @Override
+        public void endProcessing() {
+            numEndProcessing++;
+        }
+    }
 
-	@Test
-	public void intervalSystem () {
-		Engine engine = new Engine();
-		IntervalIteratingSystemSpy intervalSystemSpy = new IntervalIteratingSystemSpy();
-		ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(IntervalComponentSpy.class).get());
-		ComponentMapper<IntervalComponentSpy> im = ComponentMapper.getFor(IntervalComponentSpy.class);
+    @Test
+    public void intervalSystem() {
+        Engine engine = new Engine();
+        IntervalIteratingSystemSpy intervalSystemSpy = new IntervalIteratingSystemSpy();
+        ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(IntervalComponentSpy.class).get());
+        ComponentMapper<IntervalComponentSpy> im = ComponentMapper.getFor(IntervalComponentSpy.class);
 
-		engine.addSystem(intervalSystemSpy);
+        engine.addSystem(intervalSystemSpy);
 
-		for (int i = 0; i < 10; ++i) {
-			Entity entity = new Entity();
-			entity.add(new IntervalComponentSpy());
-			engine.addEntity(entity);
-		}
+        for (int i = 0; i < 10; ++i) {
+            Entity entity = new Entity();
+            entity.add(new IntervalComponentSpy());
+            engine.addEntity(entity);
+        }
 
-		for (int i = 1; i <= 10; ++i) {
-			engine.update(deltaTime);
+        for (int i = 1; i <= 10; ++i) {
+            engine.update(deltaTime);
 
-			for (int j = 0; j < entities.size(); ++j) {
-				assertEquals(i / 2, im.get(entities.get(j)).numUpdates);
-			}
-		}
-	}
+            for (int j = 0; j < entities.size(); ++j) {
+                assertEquals(i / 2, im.get(entities.get(j)).numUpdates);
+            }
+        }
+    }
 
-	@Test
-	public void processingUtilityFunctions() {
-		final Engine engine = new Engine();
+    @Test
+    public void processingUtilityFunctions() {
+        final Engine engine = new Engine();
 
-		final IntervalIteratingSystemSpy system = new IntervalIteratingSystemSpy();
+        final IntervalIteratingSystemSpy system = new IntervalIteratingSystemSpy();
 
-		engine.addSystem(system);
+        engine.addSystem(system);
 
-		engine.update(deltaTime);
-		assertEquals(0, system.numStartProcessing);
-		assertEquals(0, system.numEndProcessing);
+        engine.update(deltaTime);
+        assertEquals(0, system.numStartProcessing);
+        assertEquals(0, system.numEndProcessing);
 
-		engine.update(deltaTime);
-		assertEquals(1, system.numStartProcessing);
-		assertEquals(1, system.numEndProcessing);
-	}
+        engine.update(deltaTime);
+        assertEquals(1, system.numStartProcessing);
+        assertEquals(1, system.numEndProcessing);
+    }
 }
