@@ -232,7 +232,7 @@ public class PooledEngineTests {
             Entity e = engine.createEntity();
             PooledComponentSpy c = engine.createComponent(PooledComponentSpy.class);
 
-            assertEquals(false, c.recycled);
+            assertFalse(c.recycled);
 
             e.add(c);
 
@@ -245,7 +245,7 @@ public class PooledEngineTests {
             Entity e = engine.createEntity();
             PooledComponentSpy c = engine.createComponent(PooledComponentSpy.class);
 
-            assertEquals(true, c.recycled);
+            assertTrue(c.recycled);
 
             e.add(c);
         }

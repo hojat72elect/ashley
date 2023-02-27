@@ -82,15 +82,15 @@ public class FamilyTests {
         Family family9 = Family.all().get();
         Family family10 = Family.all().get();
 
-        assertTrue(family1.equals(family2));
-        assertTrue(family2.equals(family1));
-        assertTrue(family3.equals(family4));
-        assertTrue(family4.equals(family3));
-        assertTrue(family5.equals(family6));
-        assertTrue(family6.equals(family5));
-        assertTrue(family7.equals(family8));
-        assertTrue(family8.equals(family7));
-        assertTrue(family9.equals(family10));
+        assertEquals(family1, family2);
+        assertEquals(family2, family1);
+        assertEquals(family3, family4);
+        assertEquals(family4, family3);
+        assertEquals(family5, family6);
+        assertEquals(family6, family5);
+        assertEquals(family7, family8);
+        assertEquals(family8, family7);
+        assertEquals(family9, family10);
 
         assertEquals(family1.getIndex(), family2.getIndex());
         assertEquals(family3.getIndex(), family4.getIndex());
@@ -115,30 +115,30 @@ public class FamilyTests {
         Family family12 = Family.all(ComponentC.class, ComponentD.class).one(ComponentE.class, ComponentF.class).exclude(ComponentA.class, ComponentB.class).get();
         Family family13 = Family.all().get();
 
-        assertFalse(family1.equals(family2));
-        assertFalse(family1.equals(family3));
-        assertFalse(family1.equals(family4));
-        assertFalse(family1.equals(family5));
-        assertFalse(family1.equals(family6));
-        assertFalse(family1.equals(family7));
-        assertFalse(family1.equals(family8));
-        assertFalse(family1.equals(family9));
-        assertFalse(family1.equals(family10));
-        assertFalse(family1.equals(family11));
-        assertFalse(family1.equals(family12));
-        assertFalse(family1.equals(family13));
+        assertNotEquals(family1, family2);
+        assertNotEquals(family1, family3);
+        assertNotEquals(family1, family4);
+        assertNotEquals(family1, family5);
+        assertNotEquals(family1, family6);
+        assertNotEquals(family1, family7);
+        assertNotEquals(family1, family8);
+        assertNotEquals(family1, family9);
+        assertNotEquals(family1, family10);
+        assertNotEquals(family1, family11);
+        assertNotEquals(family1, family12);
+        assertNotEquals(family1, family13);
 
-        assertFalse(family10.equals(family1));
-        assertFalse(family10.equals(family2));
-        assertFalse(family10.equals(family3));
-        assertFalse(family10.equals(family4));
-        assertFalse(family10.equals(family5));
-        assertFalse(family10.equals(family6));
-        assertFalse(family10.equals(family7));
-        assertFalse(family10.equals(family8));
-        assertFalse(family10.equals(family9));
-        assertFalse(family11.equals(family12));
-        assertFalse(family10.equals(family13));
+        assertNotEquals(family10, family1);
+        assertNotEquals(family10, family2);
+        assertNotEquals(family10, family3);
+        assertNotEquals(family10, family4);
+        assertNotEquals(family10, family5);
+        assertNotEquals(family10, family6);
+        assertNotEquals(family10, family7);
+        assertNotEquals(family10, family8);
+        assertNotEquals(family10, family9);
+        assertNotEquals(family11, family12);
+        assertNotEquals(family10, family13);
 
         assertNotEquals(family1.getIndex(), family2.getIndex());
         assertNotEquals(family1.getIndex(), family3.getIndex());
@@ -162,11 +162,11 @@ public class FamilyTests {
         Family family5 = Family.all(ComponentB.class).one(ComponentC.class).exclude(ComponentA.class).get();
         Family family6 = Family.all(ComponentC.class).one(ComponentA.class).exclude(ComponentB.class).get();
 
-        assertTrue(family1.equals(family4));
-        assertTrue(family2.equals(family5));
-        assertTrue(family3.equals(family6));
-        assertFalse(family1.equals(family2));
-        assertFalse(family1.equals(family3));
+        assertEquals(family1, family4);
+        assertEquals(family2, family5);
+        assertEquals(family3, family6);
+        assertNotEquals(family1, family2);
+        assertNotEquals(family1, family3);
     }
 
     @Test
